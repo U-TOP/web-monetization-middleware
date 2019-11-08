@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "declaration": true,
+    "noImplicitAny": false,
+    "removeComments": true,
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSources": true,
+    "strictNullChecks": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "rootDir": "./src",
+    "outDir": "./build",
+    "types": ["jest"],
+    "baseUrl": "./src/",
+    "paths": {
+      "#/*": ["*"]
+    },
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"],
+  "compileOnSave": true
+}

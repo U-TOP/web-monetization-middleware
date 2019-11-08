@@ -1,0 +1,179 @@
+<html>
+  <head>
+    <meta name="monetization" content="<%= paymentPointerUri %>">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  </head>
+  <body>
+
+    <h1>Web-Monetization-Middleware express example</h1>
+    <img id="exclusiveImage" width="300" src="" alt="wait coil web monetization" />
+
+    <div>
+      <strong>PaymentPointerUri:</strong>
+      <span><%= paymentPointerUri %></span>
+    </div>
+
+    <div>
+      <strong>PaymentId:</strong>
+      <span><%= paymentId %></span>
+    </div>
+
+    <div>
+      <strong>RequestId(web-monetization-id):</strong>
+      <span id="requestId">null</span>
+    </div>
+
+    <div>
+      <strong>Monetization Progress:</strong>
+      <span id="monetizationprogress">0</span>
+    </div>
+
+    <div>
+      <strong>Monetization Total:</strong>
+      <span id="monetizationprogress-total">0</span>
+    </div>
+
+    <h3>Payouts</h3>
+
+    <div id="<%= paymentId %>">
+      <h4><%= paymentId %></h4>
+      <div>
+        <strong>MonetizedTotal:</strong><span class="monetizedTotal"></span>
+      </div>
+      <div>
+        <strong>MonetizedCount:</strong><span class="monetizedCount"></span>
+      </div>
+      <div>
+        <strong>LastMonetizedAt:</strong><span class="lastMonetizedAt"></span>
+      </div>
+      <div>
+        <strong>PayoutTotal:</strong><span class="payoutTotal"></span>
+      </div>
+      <div>
+        <strong>PayoutCount:</strong><span class="payoutCount"></span>
+      </div>
+      <div>
+        <strong>LastPayoutAt:</strong><span class="lastPayoutAt"></span>
+      </div>
+    </div>
+
+    <script>
+
+      function arrayBufferToBase64(buffer) {
+        let binary = '';
+        const bytes = [].slice.call(new Uint8Array(buffer));
+        bytes.forEach(b => (binary += String.fromCharCode(b)));
+        return window.btoa(binary);
+      }
+
+      window.onload = function() {
+
+        console.log('onload');
+
+        // payouts
+        // ---------------------------------
+        const refreshPayoutsLoop = async function(){
+
+          try{
+            // should only query information for which you have permission
+            const payoutsRaw = await fetch('/pay/payouts');
+            const payouts = await payoutsRaw.json();
+
+            console.log("payouts",payouts)
+
+            for(let paymentId in payouts){
+              const payout = payouts[paymentId]
+              $("#" + paymentId + " .monetizedTotal").text(payout.monetizedTotal);
+              $("#" + paymentId + " .monetizedCount").text(payout.monetizedCount);
+              $("#" + paymentId + " .lastMonetizedAt").text(payout.lastMonetizedAt);
+
+              $("#" + paymentId + " .payoutTotal").text(payout.payoutTotal);
+              $("#" + paymentId + " .payoutCount").text(payout.payoutCount);
+              $("#" + paymentId + " .lastPayoutAt").text(payout.lastPayoutAt);
+            }
+
+          }catch(e){
+            console.error(e)
+          }finally{
+            // loop
+            setTimeout(refreshPayoutsLoop,1000);
+          }
+        }
+
+        refreshPayoutsLoop();
+
+        // is enable coil monetize extention
+        // ---------------------------------
+        if (!document.monetization) return;
+
+        // vars
+        // ---------------------------------
+        let loadExclusiveImage = false;
+        let requestId = null;
+
+        // monetizationstart
+        // ---------------------------------
+        document.monetization.addEventListener('monetizationstart', e => {
+          console.log('monetizationstart', e);
+          requestId = e.detail.requestId;
+          $("#requestId").text(e.detail.requestId);
+        });
+
+        // monetizationprogress
+        // ---------------------------------
+        document.monetization.addEventListener('monetizationprogress', e => {
+          console.log('monetizationprogress', e);
+
+          const cost = 300;
+          const amount = e.detail.amount;
+
+          $("#monetizationprogress").text(amount);
+          $("#monetizationprogress-total").text(parseInt($("#monetizationprogress-total").text()) + parseInt(e.detail.amount));
+
+          // is loadExclusiveImage?
+          // ---------------------------------
+          if(loadExclusiveImage === true) return;
+          if(!requestId) return;
+          if(amount < cost) return;
+
+          // loadExclusiveImage
+          // ---------------------------------
+          (async () => {
+
+            // get proof(token)
+            // ---------------------------------
+            const proof = await fetch(`/pay/proof/${requestId}`);
+            const { token } = await proof.json()
+            console.log("token",token)
+
+            // fetch ExclusiveImage
+            // ---------------------------------
+            const exclusiveImage = await fetch('/exclusive_image', {
+              headers: {
+                Authorization: 'Bearer ' + token
+              }
+            })
+
+            const { image,type } = await exclusiveImage.json()
+            console.log("image",image)
+            console.log("type",type)
+
+            const imageBase64 = `data:image/${type};base64,${arrayBufferToBase64(image.data)}`;
+            console.log("imageBase64",imageBase64)
+
+            // set img
+            // ---------------------------------
+            $("#exclusiveImage").attr('src', imageBase64);
+
+            // loadExclusiveImage OK
+            // ---------------------------------
+            loadExclusiveImage = true;
+
+          })();
+
+        });
+      }
+    </script>
+
+  </body>
+</html>

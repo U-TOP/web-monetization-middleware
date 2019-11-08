@@ -1,0 +1,110 @@
+{
+  "name": "web-monetization-middleware",
+  "version": "0.0.1",
+  "author": {
+    "name": "Fujino.t",
+    "email": "fujino.t@u-top.jp"
+  },
+  "license": "Apache-2.0",
+  "licenses": [
+    {
+      "type": "Apache-2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0"
+    }
+  ],
+  "main": "index.js",
+  "types": "build/index.d.ts",
+  "dependencies": {
+    "@types/deep-equal": "^1.0.1",
+    "@types/jest": "^24.0.18",
+    "@types/jsonwebtoken": "^8.3.4",
+    "@types/koa": "^2.0.50",
+    "@types/koa-router": "^7.0.42",
+    "@types/redis": "^2.8.14",
+    "axios": "^0.19.0",
+    "bignumber.js": "^9.0.0",
+    "debug": "^3.1.0",
+    "debug-logger": "^0.4.1",
+    "dotenv": "^8.1.0",
+    "ec-key": "^0.0.4",
+    "ejs": "^2.7.1",
+    "express": "^4.17.1",
+    "find-process": "^1.4.2",
+    "git": "^0.1.5",
+    "ilp-plugin": "^3.3.1",
+    "ilp-plugin-btp": "^1.4.2",
+    "ilp-protocol-stream": "^2.0.2",
+    "ioredis": "^4.14.1",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.8.2",
+    "koa-router": "^7.4.0",
+    "node-fetch": "^2.3.0",
+    "pug": "^2.0.4",
+    "redis": "^2.8.0",
+    "reduct": "^3.3.1"
+  },
+  "devDependencies": {
+    "@types/debug": "0.0.30",
+    "@types/ioredis": "^4.0.18",
+    "@types/lodash": "^4.14.104",
+    "@types/long": "^4.0.0",
+    "@types/uuid": "^3.4.5",
+    "@typescript-eslint/eslint-plugin": "^2.3.1",
+    "@typescript-eslint/parser": "^2.3.1",
+    "base64url": "^3.0.1",
+    "deep-equal": "^1.1.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.1",
+    "jest": "^24.9.0",
+    "prettier": "^1.18.2",
+    "source-map-support": "^0.5.0",
+    "ts-jest": "^24.1.0",
+    "ts-node": "^7.0.1",
+    "tslint": "^5.8.0",
+    "tslint-config-standard": "^7.0.0",
+    "typedoc": "^0.12.0",
+    "typescript": "^3.6.3"
+  },
+  "files": [
+    "build/**/*"
+  ],
+  "scripts": {
+    "lint": "eslint --fix .",
+    "build": "tsc --project .",
+    "start": "tsc --project . && node -r dotenv/config build/index.js",
+    "debug": "tsc --project . && DEBUG=* node -r dotenv/config build/index.js",
+    "express": "tsc --project . && DEBUG=Web-Monetization-Middleware:* node -r dotenv/config examples/express/index.js",
+    "test": "DEBUG=* NODE_ENV=test jest --notify --silent=false --verbose false",
+    "test-watch": "DEBUG=* NODE_ENV=test jest --watch-all --notify --silent=false --verbose false"
+  },
+  "engines": {
+    "node": ">=10.13.0"
+  },
+  "jest": {
+    "setupFiles": [
+      "dotenv/config"
+    ],
+    "moduleNameMapper": {
+      "^#/(.+)": "<rootDir>/src/$1"
+    },
+    "verbose": true,
+    "silent": false,
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "^.+\\.(ts|tsx)$": "ts-jest"
+    },
+    "globals": {
+      "ts-jest": {
+        "tsConfigFile": "tsconfig.json"
+      }
+    },
+    "testMatch": [
+      "**/test/*.+(ts|tsx|js)"
+    ]
+  }
+}
