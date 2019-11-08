@@ -1,1 +1,0 @@
-{"version":3,"file":"index.js","sourceRoot":"","sources":["../src/index.ts"],"names":[],"mappings":";;AAAA,kDAA+C;AAC/C,kBAAgB,mBAAQ,CAAC","sourcesContent":["import { Monetize } from \"./services/Monetize\";\nexport default  Monetize;\n\n"]}
